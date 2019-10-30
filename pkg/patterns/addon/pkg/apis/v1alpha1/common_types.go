@@ -61,3 +61,13 @@ type Patchable interface {
 type PatchSpec struct {
 	Patches []*runtime.RawExtension `json:"patches,omitempty"`
 }
+
+// +k8s:deepcopy-gen=true
+type ConfigSpec struct {
+	ConfigData     []string `json:config,omitempty`
+	HashConfigName bool     `json: confighash`
+}
+
+type ConfigObject interface {
+	ConfigSpec() ConfigSpec
+}
