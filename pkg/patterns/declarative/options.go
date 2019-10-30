@@ -46,10 +46,11 @@ type reconcilerParams struct {
 	prune             bool
 	preserveNamespace bool
 
-	sink       Sink
-	ownerFn    OwnerSelector
-	labelMaker LabelMaker
-	status     Status
+	sink              Sink
+	ownerFn           OwnerSelector
+	labelMaker        LabelMaker
+	status            Status
+	hashConfigMapName HashConfigMapName
 }
 
 type ManifestController interface {
@@ -73,6 +74,9 @@ type OwnerSelector = func(context.Context, DeclarativeObject, manifest.Object, m
 
 // LabelMaker returns a fixed set of labels for a given DeclarativeObject
 type LabelMaker = func(context.Context, DeclarativeObject) map[string]string
+
+// HashConfigMapName return a hash ConfigMap name
+type HashConfigMapName = func(context.Context, DeclarativeObject) string
 
 // WithRawManifestOperation adds the specific ManifestOperations to the chain of manifest changes
 func WithRawManifestOperation(operations ...ManifestOperation) reconcilerOption {
@@ -132,6 +136,14 @@ func WithOwner(ownerFn OwnerSelector) reconcilerOption {
 func WithLabels(labelMaker LabelMaker) reconcilerOption {
 	return func(p reconcilerParams) reconcilerParams {
 		p.labelMaker = labelMaker
+		return p
+	}
+}
+
+// WithHashConfigMapName will add a hash as suffix to configmapname
+func WithHashConfigMapName(hashConfigMapName HashConfigMapName) reconcilerOption {
+	return func(p reconcilerParams) reconcilerParams {
+		p.hashConfigMapName = hashConfigMapName
 		return p
 	}
 }
