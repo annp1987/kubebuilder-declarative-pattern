@@ -64,10 +64,9 @@ type PatchSpec struct {
 
 // +k8s:deepcopy-gen=true
 type ConfigSpec struct {
-	ConfigData     []string `json:config,omitempty`
-	HashConfigName bool     `json: confighash`
+	ConfigMapGenerator *runtime.RawExtension `json:"configMapGenerator,omitempty"`
 }
 
-type ConfigObject interface {
+type ConfigMapGeneratorAble interface {
 	ConfigSpec() ConfigSpec
 }
