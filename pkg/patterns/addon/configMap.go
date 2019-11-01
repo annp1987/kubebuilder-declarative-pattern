@@ -29,11 +29,11 @@ func ApplyConfigMapGenerator(ctx context.Context, object declarative.Declarative
 	config = config.ConfigSpec().ConfigMapGenerator
 	r := bytes.NewReader(config.Raw)
 	decoder := yaml.NewYAMLOrJSONDecoder(r, 1024)
-	config_map = &unstructured.Unstructured{}
-	if err := decoder.Decode(config_map); err != nil {
+	cm := &unstructured.Unstructured{}
+	if err := decoder.Decode(cm); err != nil {
 		return fmt.Errorf("error parsing json into unstructured object: %v", err)
 	}
-	log.WithValues("config map generator ", config_map).V(1).Info("generated!!!")
+	log.WithValues("config map generator ", cm).V(1).Info("generated!!!")
 
-	return objects.Hash(config_map)
+	return objects.Hash(cm)
 }

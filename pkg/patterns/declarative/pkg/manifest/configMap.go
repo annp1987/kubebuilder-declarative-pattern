@@ -5,31 +5,34 @@ package manifest
 
 import (
 	"encoding/json"
+	"fmt"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/kustomize/api/hasher"
-	"sigs.k8s.io/kustomize/api/ifc"
 )
 
-// kustHash computes a hash of an unstructured object.
-type kustHash struct{}
+// Hash returns a hash of either a ConfigMap
+func (objects *Objects) Hash(m *unstructured.Unstructured) error {
+	log := log.Log
+	for i, o := range objects.Items {
+		log.WithValues("object", o).Info("applying configMapGenerator")
+		u := unstructured.Unstructured{
+			Object: m.Object,
+		}
+		cm, err := unstructuredToConfigmap(u)
+		if err != nil {
+			return err
+		}
+		h, err := configMapHash(cm)
 
-// NewKustHash returns a kustHash object
-func NewKustHash() *kustHash {
-	return &kustHash{}
-}
-
-// Hash returns a hash of either a ConfigMap or a Secret
-func (h *kustHash) Hash(m ifc.Kunstructured) (string, error) {
-	u := unstructured.Unstructured{
-		Object: m.Map(),
+		if err != nil {
+			return err
+		}
+		o.object.SetName(fmt.Sprintf("%s-%s", o.object.GetName(), h))
+		objects.Items[i] = o
 	}
-	cm, err := unstructuredToConfigmap(u)
-	if err != nil {
-		return "", err
-	}
-	return configMapHash(cm)
 }
 
 // configMapHash returns a hash of the ConfigMap.
