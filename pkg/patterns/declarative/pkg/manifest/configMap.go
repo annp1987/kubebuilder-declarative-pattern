@@ -30,9 +30,10 @@ func (objects *Objects) Hash(m *unstructured.Unstructured) error {
 		if err != nil {
 			return err
 		}
-		o.object.SetName(fmt.Sprintf("%s-%s", o.object.GetName(), h))
+		o.UnstructuredObject().SetName(fmt.Sprintf("%s-%s", o.UnstructuredObject().GetName(), h))
 		objects.Items[i] = o
 	}
+	return nil
 }
 
 // configMapHash returns a hash of the ConfigMap.
