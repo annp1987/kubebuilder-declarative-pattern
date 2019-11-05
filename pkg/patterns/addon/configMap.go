@@ -26,8 +26,8 @@ func ApplyConfigMapGenerator(ctx context.Context, object declarative.Declarative
 		return fmt.Errorf("provided object (%T) does not implement ConfigMapGeneratorAble type", object)
 	}
 
-	config = config.ConfigSpec().ConfigMapGenerator
-	r := bytes.NewReader(config.Raw)
+	cm_tmp := config.ConfigSpec().ConfigMapGenerator
+	r := bytes.NewReader(cm_tmp.Raw)
 	decoder := yaml.NewYAMLOrJSONDecoder(r, 1024)
 	cm := &unstructured.Unstructured{}
 	if err := decoder.Decode(cm); err != nil {
